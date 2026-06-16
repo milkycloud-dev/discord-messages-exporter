@@ -1,146 +1,92 @@
 # Discord Messages Exporter
 
-Утилита для экспорта переписки Discord в автономный HTML-файл с сохранением вложений (изображения, видео, файлы).
+A utility to export Discord chat history into a standalone offline HTML file, preserving attachments (images, videos, and files).
 
-Работает через консоль разработчика в клиенте Discord: скрипт собирает сообщения из открытого чата и отправляет их локальному серверу, который формирует готовый архив.
+The tool runs a local server and uses a script executed within the Discord developer console to collect and stream messages from an active chat session to a local directory.
 
-## Возможности
+---
 
-- Экспорт истории чата в HTML с оформлением, близким к Discord
-- Автоматическое скачивание вложений с `cdn.discordapp.com`
-- Локальное хранение: все файлы сохраняются в папку `Exported_Chats/`
-- Простой GUI на Tkinter с пошаговыми инструкциями
-- Кнопка для включения DevTools в клиенте Discord (Windows)
+## Features
 
-## Требования
+* **HTML Export:** Formats exported history similarly to the native Discord interface.
+* **Local Media Downloads:** Downloads and links images, videos, and files locally in `Exported_Chats/`.
+* **User-Friendly GUI:** Built with Tkinter to provide quick setup instructions.
+* **DevTools Access:** Includes a utility to enable DevTools within the Discord Desktop client (Windows).
 
-- **ОС:** Windows (основной сценарий; DevTools и пути к настройкам Discord рассчитаны на Windows)
-- **Python:** 3.9+
-- **Клиент Discord:** Desktop (Stable, PTB или Canary)
-- Доступ к интернету для загрузки вложений
+---
 
-## Установка
+## Requirements
 
-1. Клонируйте репозиторий:
+* **OS:** Windows (preferred for automated DevTools configuration).
+* **Python:** 3.9+
+* **Discord Client:** Stable, PTB, or Canary desktop client.
+* Internet connection (for downloading CDN attachments).
 
-```bash
-git clone https://github.com/milkycloud-dev/discord-messages-exporter.git
-cd discord-messages-exporter
-```
+---
 
-2. Установите зависимости:
+## Installation
 
-```bash
-pip install -r requirements.txt
-```
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/milkycloud-dev/discord-messages-exporter.git
+   cd discord-messages-exporter
+   ```
 
-Или запустите `start.bat` — он установит зависимости и запустит приложение.
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+   *Alternatively, run `start.bat` on Windows to install dependencies and launch the app.*
 
-## Использование
+---
 
-### 1. Запустите программу
+## Usage
 
-```bash
-python main.py
-```
+1. **Start the Exporter:**
+   Run `python main.py`. The local Flask server will launch on port `8089`.
 
-Откроется окно **Discord Chat Exporter**. Локальный сервер стартует на порту **8089**.
+2. **Enable Discord DevTools:**
+   Click **"Unlock DevTools in Discord"** in the GUI, then restart Discord. Alternatively, enable it manually in Discord configurations.
 
-### 2. Включите DevTools в Discord
+3. **Select Chat:**
+   Open Discord and navigate to the chat or channel you wish to export.
 
-В окне программы нажмите **«Разблокировать DevTools в Discord»** и перезапустите Discord.
+4. **Run Console Script:**
+   * Open DevTools (`Ctrl + Shift + I`) and go to the **Console** tab.
+   * Click **"Copy Script"** in the exporter GUI.
+   * Paste the script into the Discord console and press `Enter`.
+   * The script will scroll and fetch messages automatically.
 
-Если кнопка не сработала, включите режим разработчика вручную в настройках Discord.
+5. **Save Results:**
+   Click **"Stop and Save"** in the floating overlay on Discord or wait until the beginning of the chat is reached. Output files are saved under `Exported_Chats/<chat_name>/`.
 
-### 3. Откройте нужный чат
+---
 
-В Discord перейдите в канал или личные сообщения, историю которых нужно сохранить.
-
-### 4. Запустите экспорт
-
-1. Нажмите `Ctrl + Shift + I`, чтобы открыть инструменты разработчика.
-2. Перейдите на вкладку **Console**.
-3. В программе нажмите **«Скопировать скрипт»** и вставьте содержимое в консоль Discord.
-4. Нажмите `Enter`.
-
-Скрипт начнёт прокручивать чат вверх и собирать сообщения. В правом верхнем углу Discord появится панель с количеством собранных сообщений.
-
-### 5. Завершите экспорт
-
-- Нажмите **«Остановить и Сохранить»** в панели Discord, или
-- Дождитесь автоматического завершения, когда будет достигнуто начало чата.
-
-Готовый файл и вложения появятся в папке:
-
-```
-Exported_Chats/<название_чата>/
-├── <название_чата>.html
-└── attachments/
-    └── ...
-```
-
-## Как это работает
+## Technical Architecture
 
 ```mermaid
 flowchart LR
-    A[Discord Desktop] -->|Console script| B[Flask API :8089]
-    B --> C[Сбор HTML сообщений]
-    C --> D[BeautifulSoup]
-    D --> E[Скачивание вложений]
-    E --> F[HTML + attachments/]
+    A[Discord Desktop] -->|Console Script| B[Flask API :8089]
+    B --> C[Collect Messages]
+    C --> D[Parse HTML & Media Links]
+    D --> E[Download CDN Attachments]
+    E --> F[Generate Offline HTML Archive]
 ```
 
-1. JavaScript-скрипт в консоли Discord находит сообщения и отправляет их на `http://127.0.0.1:8089`.
-2. Flask принимает данные через эндпоинты `/init`, `/chunk`, `/finish`.
-3. После завершения программа парсит HTML, скачивает медиа с CDN Discord и переписывает ссылки на локальные файлы.
-4. Итоговый HTML можно открыть в любом браузере без подключения к Discord.
+---
 
-## API (локальный сервер)
-
-| Метод | Путь     | Описание                          |
-|-------|----------|-----------------------------------|
-| GET   | `/ping`  | Проверка доступности сервера      |
-| POST  | `/init`  | Инициализация экспорта (title, head) |
-| POST  | `/chunk` | Приём пакета сообщений            |
-| POST  | `/finish`| Запуск финальной сборки HTML      |
-
-## Структура проекта
+## Project Structure
 
 ```
 discord-messages-exporter/
-├── main.py           # GUI, Flask-сервер, логика экспорта
-├── requirements.txt  # Зависимости Python
-├── start.bat         # Быстрый запуск под Windows
-├── LICENSE           # MIT License
-└── README.md
+├── main.py           # GUI & Flask server logic
+├── requirements.txt  # Python package list
+├── start.bat         # Windows bootstrap script
+└── LICENSE           # MIT License
 ```
 
-## Зависимости
+---
 
-| Пакет          | Назначение                    |
-|----------------|-------------------------------|
-| Flask          | Локальный HTTP-сервер         |
-| flask-cors     | CORS для запросов из Discord  |
-| BeautifulSoup4 | Парсинг и обработка HTML      |
-| requests       | Скачивание вложений           |
+## License
 
-## Ограничения и замечания
-
-- Экспорт возможен только для чатов, к которым у вас есть доступ в клиенте Discord.
-- Очень длинные истории могут занимать много времени из-за прокрутки и загрузки вложений.
-- Антивирус или фаервол могут блокировать соединение между Discord и локальным сервером на порту 8089.
-- Утилита не является официальным продуктом Discord и не связана с Discord Inc.
-- Соблюдайте [Terms of Service Discord](https://discord.com/terms) и права других участников при экспорте переписки.
-
-## Устранение неполадок
-
-| Проблема | Решение |
-|----------|---------|
-| «Доступ к программе блокируется» | Убедитесь, что `main.py` запущен; проверьте антивирус и порт 8089 |
-| «Сообщения не найдены» | Откройте нужный чат/канал до запуска скрипта |
-| DevTools не открываются | Включите режим разработчика вручную или перезапустите Discord |
-| Вложения не скачиваются | Проверьте интернет; ссылки CDN могут быть недоступны для старых сообщений |
-
-## Лицензия
-
-Проект распространяется под лицензией [MIT](LICENSE).
+This project is licensed under the **MIT License**.
