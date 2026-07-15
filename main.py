@@ -2,6 +2,7 @@ import os
 import re
 import json
 import time
+import random
 import threading
 import queue
 import urllib.parse
@@ -111,6 +112,8 @@ def compile_export():
     targets = []
     for img in soup.find_all('img'):
         if img.get('src') and 'cdn.discordapp.com' in img.get('src'):
+            if '/avatars/' in img.get('src') or '/emojis/' in img.get('src') or '/icons/' in img.get('src'):
+                continue
             targets.append((img, 'src'))
             
     for source in soup.find_all('source'):
@@ -123,11 +126,22 @@ def compile_export():
             
     count = 0
     total = len(targets)
+    downloaded_urls = {}
     for tag, attr in targets:
         url = tag.get(attr)
-        if total > 0 and count % 5 == 0:
-            log_msg(f"Скачивание вложений... {count}/{total}")
-        local_filename = download_attachment(url, attachments_dir)
+        if not url:
+            continue
+            
+        if url in downloaded_urls:
+            local_filename = downloaded_urls[url]
+        else:
+            if total > 0 and count % 5 == 0:
+                log_msg(f"Скачивание вложений... {count}/{total}")
+            local_filename = download_attachment(url, attachments_dir)
+            if local_filename:
+                downloaded_urls[url] = local_filename
+            time.sleep(0.3 + random.uniform(0, 1.5)) # Рандомизированная задержка (0.3 - 1.8 сек)
+                
         if local_filename:
             tag[attr] = f"attachments/{local_filename}"
         count += 1
@@ -325,9 +339,11 @@ def main():
         }
         let oldScrollPos = scroller.scrollTop;
         scroller.scrollTop -= 700; 
-        await new Promise(r => setTimeout(r, 600)); 
+        let scrollDelay = 1800 + Math.floor(Math.random() * 1500);
+        await new Promise(r => setTimeout(r, scrollDelay)); // Увеличенная рандомизированная задержка (1.8 - 3.3 сек)
         if (scroller.scrollTop === oldScrollPos && scroller.scrollTop === 0) {
-            await new Promise(r => setTimeout(r, 1500));
+            let topDelay = 3500 + Math.floor(Math.random() * 1500);
+            await new Promise(r => setTimeout(r, topDelay)); // Ждем подгрузку (3.5 - 5.0 сек)
             if (document.querySelectorAll('li[class*="messageListItem_"]').length === messages.length) {
                 if(!keepScrolling) break; keepScrolling = false;
                 await fetch(`${SERVER_URL}/finish`, {method: "POST"});
