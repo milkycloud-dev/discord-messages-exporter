@@ -1,17 +1,27 @@
 # Python
 __pycache__/
 *.py[cod]
+*$py.class
 *.egg-info/
 .venv/
 venv/
 env/
 
-# Export output
+# Export outputs & Chat data (Strict Privacy)
 Exported_Chats/
+*.html.bak
+*.bak
 
-# IDE / OS
+# Environment & Sensitive logs
+.env
+.env.*
+*.log
+logs-agent/
+
+# IDE & OS files
 .idea/
 .vscode/
 *.swp
 Thumbs.db
 Desktop.ini
+.DS_Store
