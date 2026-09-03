@@ -13,7 +13,7 @@
   <a href="#russian--русский"><img src="https://img.shields.io/badge/Язык-Русский-red.svg" alt="Русский"></a>
   <img src="https://img.shields.io/badge/Python-3.9+-3776AB.svg?logo=python&logoColor=white" alt="Python 3.9+">
   <img src="https://img.shields.io/badge/Platform-Windows-0078D6.svg?logo=windows&logoColor=white" alt="Windows">
-  <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License">
+  <img src="https://img.shields.io/badge/License-Proprietary-red.svg" alt="Proprietary License">
 </p>
 
 ---
@@ -87,6 +87,10 @@ flowchart LR
     F --> G[Offline HTML File in Exported_Chats/]
 ```
 
+### 📄 License
+
+This software is distributed under a strict **Proprietary Software License**. All rights are reserved by MilkyCloud. Unauthorized copying, reproduction, distribution, modification, or commercial exploitation is strictly prohibited. See [`LICENSE`](LICENSE) for complete terms.
+
 ---
 
 <a name="russian--русский"></a>
@@ -158,7 +162,7 @@ discord-messages-exporter/
 ├── requirements.txt      # Список зависимостей Python
 ├── start.bat             # Скрипт быстрого запуска для Windows
 ├── .gitignore            # Защита приватных данных и экспортированных чатов
-├── LICENSE               # Лицензия MIT
+├── LICENSE               # Строгая проприетарная лицензия / Proprietary License
 └── README.md             # Документация (EN & RU)
 ```
 
@@ -166,4 +170,5 @@ discord-messages-exporter/
 
 ## 📄 Лицензия / License
 
-Распространяется под лицензией **MIT License**. См. [LICENSE](LICENSE) для подробностей.
+Программное обеспечение распространяется на условиях **строгой проприетарной лицензии (Proprietary Software License)**. Все права защищены MilkyCloud. Копирование, распространение, модификация и коммерческое использование исходного кода строго запрещены без предварительного письменного согласия правообладателя. См. [`LICENSE`](LICENSE) для подробностей.
+
