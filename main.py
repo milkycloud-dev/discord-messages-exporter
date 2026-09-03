@@ -49,12 +49,595 @@ def init_export():
     log_msg(f"Начат экспорт: {chat_title}")
     return jsonify({"status": "ok"})
 
+DISCORD_CSS = """
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --bg-primary: #313338;
+    --bg-secondary: #2b2d31;
+    --bg-tertiary: #1e1f22;
+    --text-normal: #dbdee1;
+    --text-muted: #949ba4;
+    --header-primary: #f2f3f5;
+    --interactive-normal: #b5bac1;
+    --interactive-hover: #dcdee1;
+    --interactive-active: #ffffff;
+    --brand-500: #5865f2;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-normal);
+    font-family: 'gg sans', 'Inter', 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.375rem;
+    overflow-y: scroll;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Chat Header Banner */
+.discord-header-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: 52px;
+    background-color: rgba(43, 45, 49, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.28);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.discord-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.discord-channel-icon {
+    font-size: 22px;
+    color: var(--text-muted);
+    font-weight: 400;
+    line-height: 1;
+}
+
+.discord-channel-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--header-primary);
+    letter-spacing: -0.2px;
+}
+
+.discord-header-stats {
+    font-size: 12px;
+    color: var(--text-muted);
+    background: rgba(0, 0, 0, 0.25);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+/* Chat Area Container */
+.chat-container {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 20px 16px 80px 16px;
+}
+
+ul[aria-label="Сообщения из чата"], ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Message List Item */
+li[class*="messageListItem_"] {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+/* Base Message Box */
+[class*="message_"] {
+    position: relative;
+    padding: 2px 16px 2px 72px;
+    min-height: 1.375rem;
+    font-size: 1rem;
+    line-height: 1.375rem;
+    box-sizing: border-box;
+    user-select: text;
+    border-radius: 4px;
+    margin: 0;
+}
+
+[class*="message_"]:hover {
+    background-color: rgba(2, 2, 2, 0.07);
+}
+
+/* Group Start */
+[class*="groupStart_"] {
+    margin-top: 17px;
+    min-height: 2.75rem;
+}
+
+[class*="hasReply_"] {
+    margin-top: 20px !important;
+}
+
+/* Contents wrapper */
+[class*="contents_"] {
+    position: relative;
+    width: 100%;
+}
+
+/* Avatar Styling */
+[class*="avatar_"] {
+    position: absolute;
+    left: -56px;
+    top: 2px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    user-select: none;
+    flex-shrink: 0;
+    z-index: 2;
+    object-fit: cover;
+    transition: transform 0.1s ease;
+}
+
+[class*="avatar_"]:hover {
+    transform: scale(1.05);
+}
+
+/* Avatar Decoration - centered directly over the 40px avatar */
+[class*="avatarDecoration_"] {
+    position: absolute;
+    left: -62px;
+    top: -4px;
+    width: 52px;
+    height: 52px;
+    pointer-events: none;
+    z-index: 3;
+    object-fit: contain;
+}
+
+/* Compact Timestamps in Left Gutter */
+[class*="timestampVisibleOnHover_"], [class*="latin12CompactTimeStamp_"] {
+    position: absolute;
+    left: -72px;
+    top: 2px;
+    width: 56px;
+    text-align: right;
+    font-size: 0.6875rem;
+    line-height: 1.375rem;
+    color: var(--text-muted);
+    user-select: none;
+    cursor: default;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+    white-space: nowrap;
+}
+
+[class*="message_"]:hover [class*="timestampVisibleOnHover_"],
+[class*="message_"]:hover [class*="latin12CompactTimeStamp_"] {
+    opacity: 0.8;
+}
+
+[class*="timestampVisibleOnHover_"] [class*="separator_"],
+[class*="latin12CompactTimeStamp_"] [class*="separator_"] {
+    display: none !important;
+}
+
+/* Screen reader text MUST be hidden */
+[class*="hiddenVisually_"] {
+    display: none !important;
+}
+
+/* Header (Author + Timestamp) */
+[class*="header_"] {
+    display: flex;
+    align-items: baseline;
+    line-height: 1.375rem;
+    min-height: 1.375rem;
+    color: var(--text-muted);
+    margin: 0 0 2px 0;
+    white-space: normal;
+}
+
+[class*="headerText_"] {
+    display: inline-flex;
+    align-items: baseline;
+    margin-right: 0.25rem;
+    white-space: normal;
+}
+
+[class*="username_"] {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.375rem;
+    color: var(--header-primary);
+    display: inline;
+    vertical-align: baseline;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+[class*="username_"]:hover {
+    text-decoration: underline;
+}
+
+/* Custom Display Name (Nitro gradient prism text) */
+[class*="prism_"] {
+    background: linear-gradient(90deg, var(--custom-display-name-styles-prism-stops, #f2f3f5, #f2f3f5)) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    color: transparent !important;
+    display: inline-block;
+    font-weight: 600;
+}
+
+/* Inline Timestamp next to username */
+[class*="timestampInline_"], [class*="timestamp_"]:not([class*="timestampVisibleOnHover_"]):not([class*="latin12CompactTimeStamp_"]) {
+    display: inline-flex;
+    align-items: baseline;
+    font-size: 0.75rem;
+    line-height: 1.375rem;
+    color: var(--text-muted);
+    vertical-align: baseline;
+    margin-left: 0.25rem;
+    font-weight: 400;
+    cursor: default;
+    white-space: nowrap;
+}
+
+[class*="separator_"] {
+    display: inline-block;
+    margin: 0 4px;
+    color: var(--text-muted);
+    opacity: 0.5;
+    font-style: normal;
+    font-size: 0.75rem;
+}
+
+/* Message Content Text */
+[class*="messageContent_"] {
+    user-select: text;
+    margin: 0;
+    padding: 0;
+    color: var(--text-normal);
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.375rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Links */
+a, [class*="anchor_"] {
+    color: #00a8fc !important;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+a:hover, [class*="anchor_"]:hover {
+    text-decoration: underline;
+}
+
+/* Replied Message Preview */
+[class*="repliedMessage_"] {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.875rem;
+    line-height: 1.125rem;
+    color: var(--interactive-normal);
+    margin-bottom: 4px;
+    position: relative;
+    user-select: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 18px;
+}
+
+[class*="repliedMessage_"] [class*="repliedMessageClickableSpine_"] {
+    position: absolute;
+    left: -36px;
+    top: 10px;
+    width: 28px;
+    height: calc(100% + 4px);
+    border-left: 2px solid #4e5058;
+    border-top: 2px solid #4e5058;
+    border-top-left-radius: 6px;
+    box-sizing: border-box;
+    pointer-events: none;
+}
+
+[class*="replyAvatar_"] {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    margin-right: 2px;
+    user-select: none;
+    flex-shrink: 0;
+    object-fit: cover;
+}
+
+[class*="repliedMessage_"] [class*="username_"] {
+    font-size: 0.875rem;
+    line-height: 1.125rem;
+    font-weight: 500;
+    color: var(--interactive-normal);
+    opacity: 0.9;
+}
+
+[class*="repliedTextPreview_"] {
+    display: inline-flex;
+    align-items: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-muted);
+}
+
+[class*="repliedTextContent_"] {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+/* Emojis */
+.emoji, [class*="emoji_"] {
+    width: 1.375em;
+    height: 1.375em;
+    vertical-align: -0.25em;
+    object-fit: contain;
+    display: inline-block;
+}
+
+.emoji.jumboable {
+    width: 3rem;
+    height: 3rem;
+    min-height: 3rem;
+}
+
+/* Code & Pre Blocks */
+code {
+    background: #2b2d31;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Courier New', Courier, monospace;
+    font-size: 85%;
+    color: #dbdee1;
+}
+
+pre {
+    background: #2b2d31;
+    border: 1px solid #1e1f22;
+    border-radius: 4px;
+    padding: 0;
+    margin: 6px 0;
+    font-family: 'Consolas', 'Courier New', Courier, monospace;
+    font-size: 0.875rem;
+    line-height: 1.125rem;
+    max-width: 90%;
+    overflow: hidden;
+}
+
+pre code {
+    display: block;
+    padding: 10px;
+    overflow-x: auto;
+    color: #dbdee1;
+    background: transparent;
+    border: none;
+    font-size: 0.875rem;
+    line-height: 1.125rem;
+}
+
+.hljs-keyword, .hljs-built_in { color: #f47067; }
+.hljs-string { color: #96d0ff; }
+.hljs-number { color: #6bc46d; }
+.hljs-comment { color: #8b949e; font-style: italic; }
+.hljs-title, .hljs-function { color: #d2a8ff; }
+
+/* Blockquotes */
+[class*="blockquoteContainer_"] {
+    display: flex;
+    margin: 4px 0;
+}
+
+[class*="blockquoteDivider_"] {
+    width: 4px;
+    border-radius: 4px;
+    background-color: #4e5058;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+/* Embeds */
+[class*="embed_"], [class*="embedFull_"] {
+    display: inline-grid;
+    grid-template-columns: auto;
+    grid-template-rows: auto;
+    box-sizing: border-box;
+    position: relative;
+    max-width: 520px;
+    background-color: #2b2d31;
+    border-left: 4px solid #1e1f22;
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    margin-top: 6px;
+    color: var(--text-normal);
+}
+
+[class*="embedTitle_"] {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 4px 0;
+}
+
+[class*="embedProvider_"] {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--text-muted);
+}
+
+[class*="embedDescription_"] {
+    font-size: 0.875rem;
+    line-height: 1.125rem;
+    font-weight: 400;
+    color: var(--text-normal);
+    margin-top: 4px;
+}
+
+[class*="hasThumbnail_"] {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+}
+
+[class*="embedThumbnail_"] {
+    grid-column: 2;
+    justify-self: end;
+    border-radius: 4px;
+    overflow: hidden;
+    max-width: 80px;
+    max-height: 80px;
+}
+
+/* Media, Attachments, Images */
+[class*="container_b7e1cb"], [id*="message-accessories-"] {
+    display: grid;
+    grid-auto-flow: row;
+    grid-row-gap: 0.25rem;
+    text-indent: 0;
+    min-height: 0;
+    min-width: 0;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+[class*="imageWrapper_"], [class*="imageContainer_"] {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 550px;
+    max-height: 400px;
+    display: inline-block;
+    background-color: transparent !important;
+}
+
+[class*="loadingOverlay_"] {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 550px;
+    max-height: 400px;
+    display: inline-block;
+    background-color: transparent !important;
+}
+
+[class*="loadingOverlay_"]:empty {
+    display: none !important;
+}
+
+[class*="lazyImg_"] {
+    max-width: 100%;
+    max-height: 400px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    display: block;
+}
+
+/* Reactions */
+[class*="reactions_"] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+    user-select: none;
+}
+
+[class*="reaction_"], [class*="reactionInner_"] {
+    display: inline-flex;
+    align-items: center;
+    background-color: #2b2d31;
+    border: 1px solid #383a40;
+    border-radius: 8px;
+    padding: 2px 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: var(--interactive-normal);
+    font-weight: 500;
+}
+
+[class*="reactionCount_"] {
+    margin-left: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+[class*="reactionBtn_"] {
+    display: none !important;
+}
+
+/* Mentions */
+[class*="mention"], span[class*="wrapper_"][role="button"] {
+    color: #c9cdfb !important;
+    background: hsla(235, 85.6%, 64.7%, 0.15) !important;
+    padding: 0 4px;
+    border-radius: 3px;
+    font-weight: 500;
+}
+
+span[class*="wrapper_"][role="button"]:hover {
+    background: hsla(235, 85.6%, 64.7%, 0.3) !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #2b2d31;
+}
+::-webkit-scrollbar-thumb {
+    background: #1a1b1e;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #111214;
+}
+"""
+
 def download_attachment(url, save_dir):
     try:
         parsed = urllib.parse.urlparse(url)
         filename = os.path.basename(parsed.path)
-        if not filename:
-            filename = f"file_{int(time.time())}.dat"
+        if not filename or '.' not in filename:
+            if 'avatar-decoration' in url or 'static' in filename:
+                filename = f"{filename or 'decoration'}.png"
+            else:
+                filename = f"{filename or 'file'}.dat"
         
         unique_filename = f"{int(time.time()*1000)}_{filename}"
         filepath = os.path.join(save_dir, unique_filename)
@@ -102,26 +685,46 @@ def compile_export():
     attachments_dir = os.path.join(base_dir, 'attachments')
     os.makedirs(attachments_dir, exist_ok=True)
     
+    def get_sort_key(k):
+        try:
+            parts = k.split('-')
+            for p in reversed(parts):
+                if p.isdigit():
+                    return int(p)
+            return 0
+        except Exception:
+            return 0
+
     sorted_messages = []
-    for k in sorted(messages_data.keys(), key=lambda x: int(x.split('-')[-1]) if '-' in x else 0):
+    for k in sorted(messages_data.keys(), key=get_sort_key):
         sorted_messages.append(messages_data[k])
         
     full_body = "".join(sorted_messages)
     soup = BeautifulSoup(full_body, 'html.parser')
     
+    discord_media_domains = [
+        'cdn.discordapp.com',
+        'media.discordapp.net',
+        'images-ext-1.discordapp.net',
+        'images-ext-2.discordapp.net'
+    ]
+
     targets = []
     for img in soup.find_all('img'):
-        if img.get('src') and 'cdn.discordapp.com' in img.get('src'):
-            if '/avatars/' in img.get('src') or '/emojis/' in img.get('src') or '/icons/' in img.get('src'):
+        src = img.get('src')
+        if src and any(d in src for d in discord_media_domains):
+            if '/avatars/' in src or '/emojis/' in src or '/icons/' in src:
                 continue
             targets.append((img, 'src'))
             
     for source in soup.find_all('source'):
-        if source.get('src') and 'cdn.discordapp.com' in source.get('src'):
+        src = source.get('src')
+        if src and any(d in src for d in discord_media_domains):
             targets.append((source, 'src'))
             
     for a in soup.find_all('a'):
-        if a.get('href') and 'cdn.discordapp.com/attachments' in a.get('href'):
+        href = a.get('href')
+        if href and ('/attachments/' in href or any(d in href for d in discord_media_domains)):
             targets.append((a, 'href'))
             
     count = 0
@@ -140,58 +743,83 @@ def compile_export():
             local_filename = download_attachment(url, attachments_dir)
             if local_filename:
                 downloaded_urls[url] = local_filename
-            time.sleep(0.3 + random.uniform(0, 1.5)) # Рандомизированная задержка (0.3 - 1.8 сек)
+            time.sleep(0.3 + random.uniform(0, 1.5))
                 
         if local_filename:
             tag[attr] = f"attachments/{local_filename}"
         count += 1
         
-    log_msg("Вложения скачаны. Формирование итогового файла...")
-    
+    log_msg("Вложения скачаны. Пост-обработка структуры сообщений...")
+
+    # 1. Fix relative /assets/ emoji urls
+    for img in soup.find_all('img'):
+        src = img.get('src', '')
+        if src.startswith('/assets/'):
+            img['src'] = f"https://discord.com{src}"
+
+    # 2. Remove low-res placeholder blur overlays
+    for p in soup.find_all(lambda t: t.get('class') and any('imagePlaceholder' in c for c in t.get('class'))):
+        p.decompose()
+
+    # 3. Restore missing <img> elements inside empty imageWrapper/loadingOverlay containers
+    for a in soup.find_all(lambda t: t.name == 'a' and any('originalLink' in c for c in t.get('class', []))):
+        href = a.get('href') or a.get('data-safe-src')
+        if href and (any(href.lower().endswith(ext) for ext in ['.png', '.jpg', '.jpeg', '.webp', '.gif']) or 'attachments/' in href):
+            wrapper = a.find_parent(lambda t: t.get('class') and any('imageWrapper' in c for c in t.get('class')))
+            if wrapper and not wrapper.find('img'):
+                overlay = wrapper.find(lambda t: t.get('class') and any('loadingOverlay' in c for c in t.get('class')))
+                if overlay:
+                    new_img = soup.new_tag('img', **{
+                        'class': 'lazyImg_f4758a',
+                        'src': href,
+                        'alt': 'Изображение',
+                        'style': 'display: block; object-fit: contain; max-width: 100%; max-height: 400px; border-radius: 8px;'
+                    })
+                    overlay.append(new_img)
+
+    # 4. Clean up head tags from scripts and dead preloads
+    clean_head = BeautifulSoup(document_head, 'html.parser')
+    for bad_tag in clean_head.find_all(['script', 'link']):
+        if bad_tag.name == 'script' or (bad_tag.name == 'link' and bad_tag.get('as') == 'script'):
+            bad_tag.decompose()
+        elif bad_tag.name == 'link' and bad_tag.get('href', '').startswith('/assets/'):
+            bad_tag.decompose()
+
+    total_msgs = len(messages_data)
+
     final_html = f"""<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="utf-8">
-    <title>{chat_title} - Export</title>
-    {document_head}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{chat_title} - Экспорт сообщений</title>
+    {clean_head.decode() if clean_head else ""}
     <style>
-        body {{ 
-            background-color: #313338 !important; 
-            color: #dbdee1; 
-            font-family: 'gg sans', 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; 
-            overflow-y: scroll; 
-            margin: 0; 
-            padding: 20px 0; 
-        }}
-        .container-main {{ 
-            max-width: 1000px; 
-            margin: 0 auto; 
-            background: #313338; 
-            border-radius: 8px; 
-            padding: 20px; 
-        }}
-        li[class*="messageListItem_"] {{ list-style: none; margin-bottom: 5px; }}
-        [class*="scrollerInner_"] {{ min-height: unset !important; }}
-        ul, ol {{ padding-left: 0; margin: 0; }}
-        img {{ max-width: 100%; height: auto; }}
-        a {{ pointer-events: auto !important; }}
-        .export-header {{
-            max-width: 1000px; margin: 0 auto 20px auto; 
-            padding: 20px; border-bottom: 2px solid #2b2d31;
-            font-size: 24px; font-weight: bold; color: white;
-        }}
+{DISCORD_CSS}
     </style>
 </head>
 <body class="theme-dark">
-    <div class="export-header">📁 Экспорт чата: {chat_title}</div>
-    <div class="container-main">
+    <header class="discord-header-bar">
+        <div class="discord-header-left">
+            <span class="discord-channel-icon">@</span>
+            <span class="discord-channel-title">{chat_title}</span>
+        </div>
+        <div class="discord-header-stats">
+            Сообщений: {total_msgs}
+        </div>
+    </header>
+    <main class="chat-container">
         <ul aria-label="Сообщения из чата">
             {soup.decode()}
         </ul>
-    </div>
+    </main>
 </body>
 </html>
 """
+    
+    final_html = re.sub(r'url\(([\'"]?)/assets/', r'url(\1https://discord.com/assets/', final_html)
+    final_html = re.sub(r'src=([\'"])/assets/', r'src=\1https://discord.com/assets/', final_html)
+    final_html = re.sub(r'href=([\'"])/assets/', r'href=\1https://discord.com/assets/', final_html)
     
     out_file = os.path.join(base_dir, f"{chat_title}.html")
     with open(out_file, 'w', encoding='utf-8') as f:
