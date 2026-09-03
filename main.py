@@ -25,6 +25,91 @@ logs_queue = queue.Queue()
 is_exporting = False
 export_dir = os.path.join(os.getcwd(), 'Exported_Chats')
 
+current_lang = 'en'
+
+TRANSLATIONS = {
+    'en': {
+        'win_title': 'Discord Messages Exporter',
+        'subtitle': 'Utility to export Discord chat history with attachments',
+        'step1': 'Step 1. Enable Developer Mode / Console in your Discord client:',
+        'btn_devtools': 'Unlock DevTools in Discord',
+        'step2': 'Step 2. Open the desired chat in Discord, press Ctrl + Shift + I, and open the "Console" tab.',
+        'step3': 'Step 3. Copy the script below, paste it into the Discord Console, and press Enter:',
+        'btn_copy': '📋 Copy Exporter Script',
+        'copied_title': 'Copied',
+        'copied_msg': 'Script copied to clipboard! Paste it into Discord Console and press Enter.',
+        'success_title': 'Success',
+        'devtools_success': 'Developer Mode enabled! Please restart your Discord client.',
+        'warn_title': 'Notice',
+        'devtools_fail': 'Could not locate Discord settings automatically. Please enable Developer Mode manually.',
+        'server_ready': 'Server started on port 8089. Ready to receive data from Discord...',
+        'server_error': 'CRITICAL ERROR: Server error: {e} | Port 8089 might be in use.',
+        'export_start': 'Export started: {title}',
+        'batch_recv': 'Received message batch: {count} (Total collected: {total})',
+        'compile_start': 'Processing HTML and downloading attachments. Please wait...',
+        'downloading': 'Downloading attachments... {count}/{total}',
+        'post_process': 'Attachments downloaded. Post-processing message structure...',
+        'done': '✅ Done! File saved to:\n{out_file}',
+        'download_error': 'Error downloading {url}: {e}',
+        'html_title_suffix': 'Chat Export',
+        'html_header_stats': 'Messages: {total}',
+        'lang_label': 'Language:',
+        'js_start': '[Discord Exporter] Starting...',
+        'js_err_connect': 'ERROR: Access to the exporter app is blocked by firewall/antivirus or the app was closed!',
+        'js_err_not_chat': 'Messages not found! Are you sure you are in a chat?',
+        'js_btn_stop': '🛑 Stop & Save',
+        'js_btn_saving': '⏳ Saving...',
+        'js_status_init': 'Collected: 0 messages',
+        'js_status_prefix': 'Collected:',
+        'js_status_suffix': 'messages',
+        'js_alert_stopped': 'Export stopped! Check the exporter app window.',
+        'js_alert_reached_top': 'Reached the beginning of chat! Check the exporter app window.'
+    },
+    'ru': {
+        'win_title': 'Discord Messages Exporter',
+        'subtitle': 'Утилита для экспорта переписки Discord с вложениями',
+        'step1': 'Шаг 1. Разрешите использование консоли (DevTools) в клиенте Discord:',
+        'btn_devtools': 'Разблокировать DevTools в Discord',
+        'step2': 'Шаг 2. Откройте нужный чат в Discord, нажмите Ctrl + Shift + I и откройте вкладку «Console».',
+        'step3': 'Шаг 3. Скопируйте скрипт ниже, вставьте его в Консоль (Console) и нажмите Enter:',
+        'btn_copy': '📋 Скопировать скрипт',
+        'copied_title': 'Скопировано',
+        'copied_msg': 'Скрипт скопирован! Вставьте в Console Discord и нажмите Enter.',
+        'success_title': 'Успех',
+        'devtools_success': 'Режим разработчика активирован! Перезапустите Discord.',
+        'warn_title': 'Внимание',
+        'devtools_fail': 'Не удалось найти настройки Discord. Включите Developer Mode вручную.',
+        'server_ready': 'Сервер запущен. Готов к приему данных из Discord...',
+        'server_error': 'ОШИБКА КРИТИЧЕСКАЯ: Ошибка сервера: {e} | Возможно порт 8089 занят.',
+        'export_start': 'Начат экспорт: {title}',
+        'batch_recv': 'Получено пакетов сообщений: {count} (Всего сохранено: {total})',
+        'compile_start': 'Начинается обработка HTML и скачивание вложений. Пожалуйста, подождите...',
+        'downloading': 'Скачивание вложений... {count}/{total}',
+        'post_process': 'Вложения скачаны. Пост-обработка структуры сообщений...',
+        'done': '✅ Готово! Файл сохранен в:\n{out_file}',
+        'download_error': 'Ошибка скачивания {url}: {e}',
+        'html_title_suffix': 'Экспорт сообщений',
+        'html_header_stats': 'Сообщений: {total}',
+        'lang_label': 'Язык:',
+        'js_start': '[Discord Exporter] Начинаю работу...',
+        'js_err_connect': 'ОШИБКА: Доступ к программе блокируется антивирусом или вы закрыли программу на ПК!',
+        'js_err_not_chat': 'Сообщения не найдены! Вы точно в чате?',
+        'js_btn_stop': '🛑 Остановить и сохранить',
+        'js_btn_saving': '⏳ Сохраняем...',
+        'js_status_init': 'Собрано: 0 сообщений',
+        'js_status_prefix': 'Собрано:',
+        'js_status_suffix': 'сообщений',
+        'js_alert_stopped': 'Остановлено! Смотрите окно программы.',
+        'js_alert_reached_top': 'Достигнуто начало чата! Открывайте программу.'
+    }
+}
+
+def t(key, **kwargs):
+    text = TRANSLATIONS.get(current_lang, TRANSLATIONS['en']).get(key, '')
+    if kwargs:
+        return text.format(**kwargs)
+    return text
+
 def log_msg(msg):
     print(msg)
     logs_queue.put(msg)
@@ -46,7 +131,7 @@ def init_export():
     
     messages_data = {}
     is_exporting = True
-    log_msg(f"Начат экспорт: {chat_title}")
+    log_msg(t("export_start", title=chat_title))
     return jsonify({"status": "ok"})
 
 DISCORD_CSS = """
@@ -652,7 +737,7 @@ def download_attachment(url, save_dir):
                     f.write(chunk)
             return unique_filename
     except Exception as e:
-        log_msg(f"Ошибка скачивания {url}: {e}")
+        log_msg(t("download_error", url=url, e=e))
     return None
 
 @app.route('/chunk', methods=['POST', 'OPTIONS'])
@@ -666,7 +751,7 @@ def receive_chunk():
         mid = m.get('id')
         html = m.get('html')
         messages_data[mid] = html
-    log_msg(f"Получено пакетов сообщений: {len(msgs)} (Всего сохранено: {len(messages_data)})")
+    log_msg(t("batch_recv", count=len(msgs), total=len(messages_data)))
     return jsonify({"status": "ok"})
 
 @app.route('/finish', methods=['POST', 'OPTIONS'])
@@ -678,7 +763,7 @@ def finish_export():
 
 def compile_export():
     global is_exporting
-    log_msg("Начинается обработка HTML и скачивание вложений. Пожалуйста, подождите...")
+    log_msg(t("compile_start"))
     
     os.makedirs(export_dir, exist_ok=True)
     base_dir = os.path.join(export_dir, chat_title)
@@ -739,7 +824,7 @@ def compile_export():
             local_filename = downloaded_urls[url]
         else:
             if total > 0 and count % 5 == 0:
-                log_msg(f"Скачивание вложений... {count}/{total}")
+                log_msg(t("downloading", count=count, total=total))
             local_filename = download_attachment(url, attachments_dir)
             if local_filename:
                 downloaded_urls[url] = local_filename
@@ -749,7 +834,7 @@ def compile_export():
             tag[attr] = f"attachments/{local_filename}"
         count += 1
         
-    log_msg("Вложения скачаны. Пост-обработка структуры сообщений...")
+    log_msg(t("post_process"))
 
     # 1. Fix relative /assets/ emoji urls
     for img in soup.find_all('img'):
@@ -772,7 +857,7 @@ def compile_export():
                     new_img = soup.new_tag('img', **{
                         'class': 'lazyImg_f4758a',
                         'src': href,
-                        'alt': 'Изображение',
+                        'alt': 'Attachment',
                         'style': 'display: block; object-fit: contain; max-width: 100%; max-height: 400px; border-radius: 8px;'
                     })
                     overlay.append(new_img)
@@ -788,11 +873,11 @@ def compile_export():
     total_msgs = len(messages_data)
 
     final_html = f"""<!DOCTYPE html>
-<html lang="ru">
+<html lang="{current_lang}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{chat_title} - Экспорт сообщений</title>
+    <title>{chat_title} - {t('html_title_suffix')}</title>
     {clean_head.decode() if clean_head else ""}
     <style>
 {DISCORD_CSS}
@@ -805,11 +890,11 @@ def compile_export():
             <span class="discord-channel-title">{chat_title}</span>
         </div>
         <div class="discord-header-stats">
-            Сообщений: {total_msgs}
+            {t('html_header_stats', total=total_msgs)}
         </div>
     </header>
     <main class="chat-container">
-        <ul aria-label="Сообщения из чата">
+        <ul aria-label="Messages">
             {soup.decode()}
         </ul>
     </main>
@@ -825,7 +910,7 @@ def compile_export():
     with open(out_file, 'w', encoding='utf-8') as f:
         f.write(final_html)
         
-    log_msg(f"✅ Готово! Файл сохранен в:\n{out_file}")
+    log_msg(t("done", out_file=out_file))
     is_exporting = False
 
 
@@ -863,131 +948,184 @@ def gui_loop(root, text_widget):
     root.after(100, gui_loop, root, text_widget)
 
 def run_flask():
-    log_msg("Сервер запущен. Готов к приему данных из Discord...")
+    log_msg(t("server_ready"))
     import logging
     log = logging.getLogger('werkzeug')
     log.setLevel(logging.ERROR)
     try:
         app.run(port=8089, host='0.0.0.0', debug=False, use_reloader=False)
     except Exception as e:
-        log_msg(f"ОШИБКА КРИТИЧЕСКАЯ: Ошибка сервера: {e} | Возможно порт 8089 занят.")
+        log_msg(t("server_error", e=e))
+
 def main():
     root = tk.Tk()
-    root.title("Discord Chat Exporter")
-    root.geometry("650x550")
+    root.title(t("win_title"))
+    root.geometry("680x580")
     root.configure(bg="#2b2d31")
     
     threading.Thread(target=run_flask, daemon=True).start()
     
     def create_btn(parent, text, cmd):
         return tk.Button(parent, text=text, command=cmd, bg="#5865F2", fg="white", 
-                         font=("Helvetica", 11, "bold"), relief="flat", padx=10, pady=5, cursor="hand2")
+                         font=("Helvetica", 11, "bold"), relief="flat", padx=12, pady=6, cursor="hand2")
                          
     def create_lbl(parent, text, bold=False):
         fnt = ("Helvetica", 11, "bold") if bold else ("Helvetica", 11)
         return tk.Label(parent, text=text, bg="#2b2d31", fg="#dbdee1", 
-                        font=fnt, justify="left", wraplength=600)
+                        font=fnt, justify="left", wraplength=640)
 
-    create_lbl(root, "Утилита для экспорта переписки Discord с вложениями", bold=True).pack(pady=(15, 10), anchor="center")
+    # Top Bar: Subtitle on left, Language switcher on right
+    top_bar = tk.Frame(root, bg="#2b2d31")
+    top_bar.pack(fill=tk.X, padx=20, pady=(15, 10))
 
-    create_lbl(root, "Шаг 1. Разрешите использование консоли в клиенте Discord").pack(pady=(10, 0), anchor="w", padx=20)
+    lbl_subtitle = tk.Label(top_bar, text=t("subtitle"), bg="#2b2d31", fg="#f2f3f5",
+                            font=("Helvetica", 11, "bold"), justify="left", wraplength=460)
+    lbl_subtitle.pack(side=tk.LEFT, anchor="w")
+
+    lang_frame = tk.Frame(top_bar, bg="#2b2d31")
+    lang_frame.pack(side=tk.RIGHT, anchor="e")
+
+    lbl_lang = tk.Label(lang_frame, text=t("lang_label"), bg="#2b2d31", fg="#949ba4", font=("Helvetica", 10))
+    lbl_lang.pack(side=tk.LEFT, padx=(0, 6))
+
+    btn_lang_en = tk.Button(lang_frame, text="EN", command=lambda: set_language("en"),
+                            bg="#5865F2", fg="white", font=("Helvetica", 10, "bold"),
+                            relief="flat", padx=8, pady=3, cursor="hand2")
+    btn_lang_en.pack(side=tk.LEFT, padx=2)
+
+    btn_lang_ru = tk.Button(lang_frame, text="RU", command=lambda: set_language("ru"),
+                            bg="#383a40", fg="#949ba4", font=("Helvetica", 10, "bold"),
+                            relief="flat", padx=8, pady=3, cursor="hand2")
+    btn_lang_ru.pack(side=tk.LEFT, padx=2)
+
+    # Step 1
+    lbl_step1 = create_lbl(root, t("step1"))
+    lbl_step1.pack(pady=(10, 0), anchor="w", padx=20)
     
     def btn_enable_devtools():
         if enable_discord_devtools():
-            messagebox.showinfo("Успех", "Режим разработчика активирован! Перезапустите Discord.")
+            messagebox.showinfo(t("success_title"), t("devtools_success"))
         else:
-            messagebox.showwarning("Внимание", "Не удалось найти настройки Discord. Включите Developer Mode вручную.")
+            messagebox.showwarning(t("warn_title"), t("devtools_fail"))
             
-    create_btn(root, "Разблокировать DevTools в Discord", btn_enable_devtools).pack(pady=5, anchor="w", padx=20)
+    btn_devtools = create_btn(root, t("btn_devtools"), btn_enable_devtools)
+    btn_devtools.pack(pady=5, anchor="w", padx=20)
     
-    create_lbl(root, "Шаг 2. Откройте нужный чат. Нажмите Ctrl + Shift + I. Откройте вкладку 'Console'.").pack(pady=(10, 0), anchor="w", padx=20)
+    # Step 2
+    lbl_step2 = create_lbl(root, t("step2"))
+    lbl_step2.pack(pady=(10, 0), anchor="w", padx=20)
     
-    def btn_copy_script():
-        script = """
-(async function() {
-    console.log("%c[Discord Exporter] Начинаю работу...", "color: #5865F2; font-size: 20px; font-weight: bold;");
+    # Step 3
+    def get_injected_script():
+        return f"""
+(async function() {{
+    console.log("%c{t('js_start')}", "color: #5865F2; font-size: 20px; font-weight: bold;");
     let SERVER_URL = "http://127.0.0.1:8089";
-    try { 
-        await fetch(`${SERVER_URL}/ping`); 
-    } catch(e) {
-        console.warn("127.0.0.1 недоступен, пробуем localhost", e);
+    try {{ 
+        await fetch(`${{SERVER_URL}}/ping`); 
+    }} catch(e) {{
+        console.warn("127.0.0.1 unreachable, trying localhost...", e);
         SERVER_URL = "http://localhost:8089";
-        try {
-            await fetch(`${SERVER_URL}/ping`);
-        } catch(e2) {
-            alert("ОШИБКА: Доступ к программе блокируется антивирусом или вы закрыли программу на ПК!"); 
+        try {{ 
+            await fetch(`${{SERVER_URL}}/ping`); 
+        }} catch(e2) {{
+            alert("{t('js_err_connect')}"); 
             return;
-        }
-    }
+        }}
+    }}
     const titleMatch = document.title.replace(/[^a-zA-Zа-яА-Я0-9_ -]/g, "");
-    await fetch(`${SERVER_URL}/init`, {
-        method: "POST", headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ head: document.head.innerHTML, title: titleMatch })
-    });
+    await fetch(`${{SERVER_URL}}/init`, {{
+        method: "POST", headers: {{"Content-Type": "application/json"}},
+        body: JSON.stringify({{ head: document.head.innerHTML, title: titleMatch }})
+    }});
     let msgNode = document.querySelector('li[class*="messageListItem_"]');
-    if(!msgNode) { alert("Сообщения не найдены! Вы точно в чате?"); return; }
+    if(!msgNode) {{ alert("{t('js_err_not_chat')}"); return; }}
     let scroller = msgNode.parentElement;
-    while(scroller && (!scroller.className || !scroller.className.includes("scroller_"))) {
+    while(scroller && (!scroller.className || !scroller.className.includes("scroller_"))) {{
         scroller = scroller.parentElement;
-    }
+    }}
     let exportedIds = new Set();
     let keepScrolling = true;
     let uiLayer = document.createElement("div");
     uiLayer.style = "position:fixed;top:20px;right:20px;z-index:999999;background:#1e1f22;padding:25px;border-radius:10px;box-shadow:0 0 15px rgba(0,0,0,0.8);color:white;text-align:center;font-family:sans-serif;";
     let stopBtn = document.createElement("button");
-    stopBtn.innerText = "🛑 Остановить и Сохранить";
+    stopBtn.innerText = "{t('js_btn_stop')}";
     stopBtn.style = "background:#5865F2;color:white;border:none;padding:12px 24px;font-size:16px;font-weight:bold;border-radius:6px;cursor:pointer;margin-top:10px;";
     let statusTxt = document.createElement("div");
-    statusTxt.innerText = "Собрано: 0 сообщений";
+    statusTxt.innerText = "{t('js_status_init')}";
     statusTxt.style = "font-weight:bold;font-size:20px;margin-bottom:10px;color:#5865f2;";
     uiLayer.appendChild(statusTxt); uiLayer.appendChild(stopBtn); document.body.appendChild(uiLayer);
     
-    stopBtn.onclick = async () => {
+    stopBtn.onclick = async () => {{
         if(!keepScrolling) return; keepScrolling = false;
-        stopBtn.innerText = "⏳ Сохраняем..."; stopBtn.style.background = "#ED4245";
-        await fetch(`${SERVER_URL}/finish`, {method: "POST"});
+        stopBtn.innerText = "{t('js_btn_saving')}"; stopBtn.style.background = "#ED4245";
+        await fetch(`${{SERVER_URL}}/finish`, {{method: "POST"}});
         uiLayer.remove();
-        alert("Остановлено! Смотрите окно программы.");
-    };
-    while (keepScrolling) {
+        alert("{t('js_alert_stopped')}");
+    }};
+    while (keepScrolling) {{
         let messages = Array.from(document.querySelectorAll('li[class*="messageListItem_"]'));
         let newMessagesData = [];
-        for (let msg of messages) {
+        for (let msg of messages) {{
             let id = msg.id;
             if (!id || exportedIds.has(id)) continue;
             exportedIds.add(id);
-            newMessagesData.push({ id: id, html: msg.outerHTML });
-        }
-        if (newMessagesData.length > 0) {
-            statusTxt.innerText = `Собрано: ${exportedIds.size} сообщений`;
-            await fetch(`${SERVER_URL}/chunk`, {
-                method: "POST", headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ messages: newMessagesData })
-            });
-        }
+            newMessagesData.push({{ id: id, html: msg.outerHTML }});
+        }}
+        if (newMessagesData.length > 0) {{
+            statusTxt.innerText = "{t('js_status_prefix')} " + exportedIds.size + " {t('js_status_suffix')}";
+            await fetch(`${{SERVER_URL}}/chunk`, {{
+                method: "POST", headers: {{"Content-Type": "application/json"}},
+                body: JSON.stringify({{ messages: newMessagesData }})
+            }});
+        }}
         let oldScrollPos = scroller.scrollTop;
         scroller.scrollTop -= 700; 
         let scrollDelay = 1800 + Math.floor(Math.random() * 1500);
-        await new Promise(r => setTimeout(r, scrollDelay)); // Увеличенная рандомизированная задержка (1.8 - 3.3 сек)
-        if (scroller.scrollTop === oldScrollPos && scroller.scrollTop === 0) {
+        await new Promise(r => setTimeout(r, scrollDelay));
+        if (scroller.scrollTop === oldScrollPos && scroller.scrollTop === 0) {{
             let topDelay = 3500 + Math.floor(Math.random() * 1500);
-            await new Promise(r => setTimeout(r, topDelay)); // Ждем подгрузку (3.5 - 5.0 сек)
-            if (document.querySelectorAll('li[class*="messageListItem_"]').length === messages.length) {
+            await new Promise(r => setTimeout(r, topDelay));
+            if (document.querySelectorAll('li[class*="messageListItem_"]').length === messages.length) {{
                 if(!keepScrolling) break; keepScrolling = false;
-                await fetch(`${SERVER_URL}/finish`, {method: "POST"});
+                await fetch(`${{SERVER_URL}}/finish`, {{method: "POST"}});
                 uiLayer.remove();
-                alert("Достигнуто начало чата! Открывайте программу.");
-            }
-        }
-    }
-})();
-        """
+                alert("{t('js_alert_reached_top')}");
+            }}
+        }}
+    }}
+}})();
+"""
+
+    def btn_copy_script():
+        script = get_injected_script().strip()
         root.clipboard_clear()
-        root.clipboard_append(script.strip())
-        messagebox.showinfo("Скопировано", "Скрипт скопирован! Вставьте в Console Discord, нажмите Enter.")
+        root.clipboard_append(script)
+        messagebox.showinfo(t("copied_title"), t("copied_msg"))
         
-    create_lbl(root, "Шаг 3. Скопируйте магический скрипт и вставьте его в Консоль (Console).").pack(pady=(10, 0), anchor="w", padx=20)
-    create_btn(root, "📋 Скопировать скрипт", btn_copy_script).pack(pady=5, anchor="w", padx=20)
+    lbl_step3 = create_lbl(root, t("step3"))
+    lbl_step3.pack(pady=(10, 0), anchor="w", padx=20)
+    btn_copy = create_btn(root, t("btn_copy"), btn_copy_script)
+    btn_copy.pack(pady=5, anchor="w", padx=20)
+
+    def set_language(lang):
+        global current_lang
+        current_lang = lang
+        root.title(t("win_title"))
+        lbl_subtitle.config(text=t("subtitle"))
+        lbl_lang.config(text=t("lang_label"))
+        lbl_step1.config(text=t("step1"))
+        btn_devtools.config(text=t("btn_devtools"))
+        lbl_step2.config(text=t("step2"))
+        lbl_step3.config(text=t("step3"))
+        btn_copy.config(text=t("btn_copy"))
+
+        if lang == 'en':
+            btn_lang_en.config(bg="#5865F2", fg="white")
+            btn_lang_ru.config(bg="#383a40", fg="#949ba4")
+        else:
+            btn_lang_ru.config(bg="#5865F2", fg="white")
+            btn_lang_en.config(bg="#383a40", fg="#949ba4")
 
     log_area = scrolledtext.ScrolledText(root, height=10, bg="#1e1f22", fg="#dbdee1", font=("Consolas", 10), state="normal", borderwidth=0)
     log_area.pack(padx=20, pady=(15, 20), fill=tk.BOTH, expand=True)
