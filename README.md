@@ -27,15 +27,15 @@
 
 ### Key Features
 
-* **🎨 Pixel-Perfect Discord UI**: Authentic Discord dark theme (`#313338`), cozy message spacing, custom Nitro gradient prism display names, Google Inter fallback fonts, and custom Discord scrollbars.
-* **✨ Avatar Decoration Alignment**: Avatar decorations (frames, animations, special effects) are aligned directly over profile avatars with absolute pixel accuracy.
-* **📥 Local Media Downloader**: Automatically downloads attachments (images, audio, videos) from `cdn.discordapp.com` and `media.discordapp.net` into a dedicated local `attachments/` folder.
-* **🖼️ Lazy-Loaded Image Recovery**: Recovers and embeds full-resolution images from anchor links (`<a>`) even when Discord DOM virtualization unloaded the `<img>` tags before export.
-* **🕒 Clean Timestamps**: Strips redundant screen-reader accessibility text and displays clear timestamps, including left-gutter timestamps that appear on hover for consecutive messages.
-* **🌐 Offline Asset Resolution**: Resolves Discord emoji and SVG icon paths so all emojis and interface icons render seamlessly offline.
-* **🗣️ Bilingual GUI**: Native Tkinter user interface with real-time switching between **English (default)** and **Russian**.
-* **⚡ One-Click DevTools Unlocker**: Automatically enables Developer Mode / DevTools across Discord Stable, PTB, and Canary client installations on Windows.
-* **🤖 In-Discord HUD Overlay**: The injected console script provides a floating on-screen HUD displaying real-time message collection counts and a manual **"Stop & Save"** button.
+* **Pixel-Perfect Discord UI**: Authentic Discord dark theme (`#313338`), cozy message spacing, custom Nitro gradient prism display names, Google Inter fallback fonts, and custom Discord scrollbars.
+* **Avatar Decoration Alignment**: Avatar decorations (frames, animations, special effects) are aligned directly over profile avatars with absolute pixel accuracy.
+* **Local Media Downloader**: Automatically downloads attachments (images, audio, videos) from `cdn.discordapp.com` and `media.discordapp.net` into a dedicated local `attachments/` folder.
+* **Lazy-Loaded Image Recovery**: Recovers and embeds full-resolution images from anchor links (`<a>`) even when Discord DOM virtualization unloaded the `<img>` tags before export.
+* **Clean Timestamps**: Strips redundant screen-reader accessibility text and displays clear timestamps, including left-gutter timestamps that appear on hover for consecutive messages.
+* **Offline Asset Resolution**: Resolves Discord emoji and SVG icon paths so all emojis and interface icons render offline.
+* **Bilingual GUI**: Native Tkinter user interface with real-time switching between **English (default)** and **Russian**.
+* **One-Click DevTools Unlocker**: Automatically enables Developer Mode / DevTools across Discord Stable, PTB, and Canary client installations on Windows.
+* **In-Discord HUD Overlay**: The injected console script provides a floating on-screen HUD displaying real-time message collection counts and a manual **"Stop & Save"** button.
 
 ### System Requirements
 
@@ -87,7 +87,7 @@ flowchart LR
     F --> G[Offline HTML File in Exported_Chats/]
 ```
 
-### 📄 License
+### License
 
 This software is distributed under a strict **Proprietary Software License**. All rights are reserved by MilkyCloud. Unauthorized copying, reproduction, distribution, modification, or commercial exploitation is strictly prohibited. See [`LICENSE`](LICENSE) for complete terms.
 
@@ -98,19 +98,19 @@ This software is distributed under a strict **Proprietary Software License**. Al
 
 ### Описание
 
-**Discord Messages Exporter** — это удобное настольное приложение для сохранения истории переписки Discord (личных сообщений и каналов) в виде автономных HTML-файлов. В отличие от стандартных парсеров, данный инструмент полностью воссоздает аутентичный визуальный интерфейс Discord.
+**Discord Messages Exporter** сохраняет историю переписки Discord (личные сообщения и каналы) в автономные HTML-файлы. В отличие от обычных парсеров, он воспроизводит интерфейс Discord.
 
 ### Основные возможности
 
-* **🎨 Аутентичный интерфейс Discord**: Точное воспроизведение тёмной темы Discord (`#313338`), комфортный интервал сообщений (Cozy View), поддержка градиентных ников Nitro Prism, скругления блоков и фирменные скроллбары.
-* **✨ Идеальное позиционирование украшений профиля**: Украшения аватаров (рамки, эффекты, космические звезды) точно центрируются поверх круга аватара без сдвигов и отрывов.
-* **📥 Локальная загрузка вложений**: Автоматическое скачивание всех прикрепленных файлов (изображений, видео, аудио) из `cdn.discordapp.com` и `media.discordapp.net` в локальную папку `attachments/`.
-* **🖼️ Восстановление виртуализированных изображений**: Автоматически извлекает и вставляет полноразмерные изображения из тегов-ссылок (`<a>`), даже если Discord выгрузил теги `<img>` из виртуального DOM перед экспортом.
-* **🕒 Аккуратные временные метки**: Устранены повторяющиеся даты скринридеров; компактные временные метки аккуратно всплывают в левой колонке при наведении на последовательные сообщения.
-* **🌐 Офлайн-разрешение SVG и эмодзи**: Преобразует относительные пути иконок и смайлов в прямые ссылки на CDN, предотвращая ошибки 404 при просмотре без интернета.
-* **🗣️ Двуязычный интерфейс**: Переключение между **английским (по умолчанию)** и **русским** языками в один клик прямо в окне программы.
-* **⚡ Разблокировка DevTools в один клик**: Автоматически включает консоль разработчика в клиентах Discord Stable, PTB и Canary на Windows.
-* **🤖 Плавающий оверлей в Discord**: Скрипт отображает интерактивный виджет со счётчиком собранных сообщений и кнопкой ручной остановки **«🛑 Остановить и сохранить»**.
+* **Аутентичный интерфейс Discord**: Точное воспроизведение тёмной темы Discord (`#313338`), комфортный интервал сообщений (Cozy View), поддержка градиентных ников Nitro Prism, скругления блоков и фирменные скроллбары.
+* **Позиционирование украшений профиля**: Украшения аватаров (рамки, эффекты, космические звезды) точно центрируются поверх круга аватара без сдвигов и отрывов.
+* **Локальная загрузка вложений**: Автоматическое скачивание всех прикрепленных файлов (изображений, видео, аудио) из `cdn.discordapp.com` и `media.discordapp.net` в локальную папку `attachments/`.
+* **Восстановление виртуализированных изображений**: Автоматически извлекает и вставляет полноразмерные изображения из тегов-ссылок (`<a>`), даже если Discord выгрузил теги `<img>` из виртуального DOM перед экспортом.
+* **Аккуратные временные метки**: Устранены повторяющиеся даты скринридеров; компактные временные метки аккуратно всплывают в левой колонке при наведении на последовательные сообщения.
+* **Офлайн-разрешение SVG и эмодзи**: Преобразует относительные пути иконок и смайлов в прямые ссылки на CDN, предотвращая ошибки 404 при просмотре без интернета.
+* **Двуязычный интерфейс**: Переключение между **английским (по умолчанию)** и **русским** языками в один клик прямо в окне программы.
+* **Разблокировка DevTools в один клик**: Автоматически включает консоль разработчика в клиентах Discord Stable, PTB и Canary на Windows.
+* **Плавающий оверлей в Discord**: Скрипт отображает интерактивный виджет со счётчиком собранных сообщений и кнопкой ручной остановки **«🛑 Остановить и сохранить»**.
 
 ### Системные требования
 
@@ -152,7 +152,7 @@ This software is distributed under a strict **Proprietary Software License**. Al
 
 ---
 
-## 📁 Структура проекта / Project Structure
+## Структура проекта / Project structure
 
 ```
 discord-messages-exporter/
@@ -168,7 +168,7 @@ discord-messages-exporter/
 
 ---
 
-## 📄 Лицензия / License
+## Лицензия / License
 
 Программное обеспечение распространяется на условиях **строгой проприетарной лицензии (Proprietary Software License)**. Все права защищены MilkyCloud. Копирование, распространение, модификация и коммерческое использование исходного кода строго запрещены без предварительного письменного согласия правообладателя. См. [`LICENSE`](LICENSE) для подробностей.
 
