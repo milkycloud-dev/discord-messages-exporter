@@ -1,174 +1,107 @@
-<p align="center">
-  <img src="assets/logo.png" alt="Discord Messages Exporter Logo" width="180" style="border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.5);">
-</p>
+<p align="center"><img src="assets/logo.png" width="128" height="128" alt="Discord Messages Exporter icon"></p>
 
 <h1 align="center">Discord Messages Exporter</h1>
 
-<p align="center">
-  <b>A standalone utility to export Discord chat history into beautiful, pixel-perfect offline HTML archives with attachments and full styling preservation.</b>
-</p>
+<p align="center">Windows app that saves a Discord channel or direct message history into an offline HTML archive styled like the Discord client, with images, video and audio downloaded next to it.</p>
 
-<p align="center">
-  <a href="#english"><img src="https://img.shields.io/badge/Language-English-blue.svg" alt="English"></a>
-  <a href="#russian--русский"><img src="https://img.shields.io/badge/Язык-Русский-red.svg" alt="Русский"></a>
-  <img src="https://img.shields.io/badge/Python-3.9+-3776AB.svg?logo=python&logoColor=white" alt="Python 3.9+">
-  <img src="https://img.shields.io/badge/Platform-Windows-0078D6.svg?logo=windows&logoColor=white" alt="Windows">
-  <img src="https://img.shields.io/badge/License-Proprietary-red.svg" alt="Proprietary License">
-</p>
+<p align="center"><a href="https://github.com/milkycloud-dev/discord-messages-exporter/actions/workflows/release.yml"><img src="https://github.com/milkycloud-dev/discord-messages-exporter/actions/workflows/release.yml/badge.svg" alt="Release"></a></p>
 
----
+<p align="center"><a href="#english">English</a> | <a href="#русский">Русский</a></p>
 
-<a name="english"></a>
-## 🇬🇧 English Documentation
+<a id="english"></a>
 
-### Overview
+## English
 
-**Discord Messages Exporter** is a lightweight, non-intrusive desktop application that exports Discord channel conversations or direct messages into self-contained, offline-viewable HTML files. Unlike basic scrapers that produce broken layouts, this exporter faithfully reproduces the native Discord desktop user experience.
+### How it works
 
-### Key Features
+The app starts a small local server on `127.0.0.1:8089` and gives you a script for the Discord DevTools console. The script scrolls the open chat upwards, collects the rendered messages and sends them to the app. The app sorts them, downloads the attachments and writes one HTML file that opens without internet access.
 
-* **Pixel-Perfect Discord UI**: Authentic Discord dark theme (`#313338`), cozy message spacing, custom Nitro gradient prism display names, Google Inter fallback fonts, and custom Discord scrollbars.
-* **Avatar Decoration Alignment**: Avatar decorations (frames, animations, special effects) are aligned directly over profile avatars with absolute pixel accuracy.
-* **Local Media Downloader**: Automatically downloads attachments (images, audio, videos) from `cdn.discordapp.com` and `media.discordapp.net` into a dedicated local `attachments/` folder.
-* **Lazy-Loaded Image Recovery**: Recovers and embeds full-resolution images from anchor links (`<a>`) even when Discord DOM virtualization unloaded the `<img>` tags before export.
-* **Clean Timestamps**: Strips redundant screen-reader accessibility text and displays clear timestamps, including left-gutter timestamps that appear on hover for consecutive messages.
-* **Offline Asset Resolution**: Resolves Discord emoji and SVG icon paths so all emojis and interface icons render offline.
-* **Bilingual GUI**: Native Tkinter user interface with real-time switching between **English (default)** and **Russian**.
-* **One-Click DevTools Unlocker**: Automatically enables Developer Mode / DevTools across Discord Stable, PTB, and Canary client installations on Windows.
-* **In-Discord HUD Overlay**: The injected console script provides a floating on-screen HUD displaying real-time message collection counts and a manual **"Stop & Save"** button.
-
-### System Requirements
-
-* **Operating System**: Windows 10 / 11
-* **Python**: 3.9 or newer
-* **Discord Client**: Official Discord Desktop client (Stable, PTB, or Canary)
-* **Network**: Internet connection (required during export to download CDN attachments)
-
-### Installation
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/milkycloud-dev/discord-messages-exporter.git
-   cd discord-messages-exporter
-   ```
-
-2. **Install Python dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-   *(Or simply double-click `start.bat` on Windows to install dependencies and launch automatically)*
-
-### Usage Guide
-
-1. **Launch the Application**:
-   Run `python main.py` or double-click `start.bat`. The local server starts on `http://127.0.0.1:8089`.
-2. **Unlock DevTools**:
-   Click **"Unlock DevTools in Discord"** in the app window, then restart your Discord client.
-3. **Open Target Chat**:
-   In Discord, open the direct message or channel you want to archive.
-4. **Copy & Run Script**:
-   * Press `Ctrl + Shift + I` in Discord to open DevTools, then switch to the **Console** tab.
-   * In the Exporter app, click **"📋 Copy Exporter Script"**.
-   * Paste the script into the Discord Console and press `Enter`.
-5. **Collect & Save**:
-   * The script automatically scrolls upward to fetch history while displaying a floating HUD.
-   * Click **"🛑 Stop & Save"** at any moment, or let it scroll until the chat origin is reached.
-   * The finalized archive and attachments are saved under `Exported_Chats/<chat_title>/`.
-
-### Architecture
-
-```mermaid
-flowchart LR
-    A[Discord Client] -->|Console Script & Auto-Scroller| B[Local Flask Server :8089]
-    B --> C[Aggregate & Sort Messages]
-    C --> D[HTML Parser & Image Restorer]
-    D --> E[Download Media Attachments]
-    E --> F[Inject Discord CSS & Fix Assets]
-    F --> G[Offline HTML File in Exported_Chats/]
 ```
+Discord client (console script, auto-scroll) > local server :8089 > sort and merge > attachments > HTML in Exported_Chats/
+```
+
+Nothing is sent anywhere except between the Discord window and the app on the same computer.
+
+### Features
+
+- Dark Discord theme, cozy message spacing, Nitro gradient names, avatar decorations placed over the avatar.
+- Attachments from `cdn.discordapp.com` and `media.discordapp.net` saved to `attachments/`.
+- Full-size images recovered from links when Discord had already unloaded the `<img>` tags.
+- Screen-reader duplicates removed from timestamps; short timestamps in the left gutter for grouped messages.
+- Emoji and SVG icon paths rewritten so they render offline.
+- On-screen counter in Discord with a `Stop & Save` button; the script also stops at the start of the chat.
+- One button enables DevTools in Discord Stable, PTB and Canary.
+- Interface in English and Russian.
+
+### Requirements
+
+Windows 10 or 11, the Discord desktop client, Python 3.9 or newer when running from source, internet access during the export for the attachments.
+
+### Usage
+
+1. Start the app (`python main.py` or `start.bat`).
+2. Click "Unlock DevTools in Discord" and restart Discord.
+3. Open the chat you want to save.
+4. Press `Ctrl+Shift+I`, open the Console tab, paste the script copied from the app and press Enter.
+5. Wait for the start of the chat or click `Stop & Save`. The archive is written to `Exported_Chats/<chat title>/`.
+
+### Discord terms
+
+Scripts in the client console and automated scrolling are outside what Discord allows for user accounts. Use it for your own conversations and at your own risk.
+
+### Releases
+
+A tag `v*` builds `DiscordExporter_Windows.zip` with PyInstaller on GitHub Actions and publishes it with the notes from [CHANGELOG.md](CHANGELOG.md).
 
 ### License
 
-This software is distributed under a strict **Proprietary Software License**. All rights are reserved by MilkyCloud. Unauthorized copying, reproduction, distribution, modification, or commercial exploitation is strictly prohibited. See [`LICENSE`](LICENSE) for complete terms.
+Proprietary, all rights reserved. Running the official release builds is allowed; see [LICENSE](LICENSE) for the full terms.
 
----
+<a id="русский"></a>
 
-<a name="russian--русский"></a>
-## 🇷🇺 Русскоязычная документация
+## Русский
 
-### Описание
+### Как это работает
 
-**Discord Messages Exporter** сохраняет историю переписки Discord (личные сообщения и каналы) в автономные HTML-файлы. В отличие от обычных парсеров, он воспроизводит интерфейс Discord.
-
-### Основные возможности
-
-* **Аутентичный интерфейс Discord**: Точное воспроизведение тёмной темы Discord (`#313338`), комфортный интервал сообщений (Cozy View), поддержка градиентных ников Nitro Prism, скругления блоков и фирменные скроллбары.
-* **Позиционирование украшений профиля**: Украшения аватаров (рамки, эффекты, космические звезды) точно центрируются поверх круга аватара без сдвигов и отрывов.
-* **Локальная загрузка вложений**: Автоматическое скачивание всех прикрепленных файлов (изображений, видео, аудио) из `cdn.discordapp.com` и `media.discordapp.net` в локальную папку `attachments/`.
-* **Восстановление виртуализированных изображений**: Автоматически извлекает и вставляет полноразмерные изображения из тегов-ссылок (`<a>`), даже если Discord выгрузил теги `<img>` из виртуального DOM перед экспортом.
-* **Аккуратные временные метки**: Устранены повторяющиеся даты скринридеров; компактные временные метки аккуратно всплывают в левой колонке при наведении на последовательные сообщения.
-* **Офлайн-разрешение SVG и эмодзи**: Преобразует относительные пути иконок и смайлов в прямые ссылки на CDN, предотвращая ошибки 404 при просмотре без интернета.
-* **Двуязычный интерфейс**: Переключение между **английским (по умолчанию)** и **русским** языками в один клик прямо в окне программы.
-* **Разблокировка DevTools в один клик**: Автоматически включает консоль разработчика в клиентах Discord Stable, PTB и Canary на Windows.
-* **Плавающий оверлей в Discord**: Скрипт отображает интерактивный виджет со счётчиком собранных сообщений и кнопкой ручной остановки **«🛑 Остановить и сохранить»**.
-
-### Системные требования
-
-* **Операционная система**: Windows 10 / 11
-* **Версия Python**: 3.9 или выше
-* **Клиент Discord**: Официальный настольный клиент Discord (Stable, PTB или Canary)
-* **Сеть**: Подключение к интернету (для загрузки вложений с серверов CDN)
-
-### Установка
-
-1. **Клонируйте репозиторий:**
-   ```bash
-   git clone https://github.com/milkycloud-dev/discord-messages-exporter.git
-   cd discord-messages-exporter
-   ```
-
-2. **Установите зависимости:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-   *(Или запустите файл `start.bat` в Windows для автоматической установки и запуска)*
-
-### Инструкция по использованию
-
-1. **Запустите программу**:
-   Запустите `python main.py` или откройте `start.bat`. Локальный сервер начнет работу на порту `8089`.
-2. **Разблокируйте DevTools**:
-   Нажмите кнопку **«Разблокировать DevTools в Discord»** в окне программы и перезапустите Discord.
-3. **Откройте нужный чат**:
-   В Discord перейдите в диалог или канал, переписку которого хотите сохранить.
-4. **Скопируйте и выполните скрипт**:
-   * Нажмите `Ctrl + Shift + I` в Discord для открытия панели разработчика и перейдите на вкладку **Console**.
-   * В окне программы нажмите **«📋 Скопировать скрипт»**.
-   * Вставьте скопированный код в консоль Discord и нажмите `Enter`.
-5. **Сбор и сохранение**:
-   * Скрипт начнет автоматически прокручивать историю сообщений вверх.
-   * Нажмите **«🛑 Остановить и сохранить»** в любой момент или дождитесь достижения самого начала переписки.
-   * Готовый архив и вложения будут сохранены в папку `Exported_Chats/<название_чата>/`.
-
----
-
-## Структура проекта / Project structure
+Приложение поднимает небольшой локальный сервер на `127.0.0.1:8089` и выдаёт скрипт для консоли DevTools в Discord. Скрипт прокручивает открытый чат вверх, собирает отрисованные сообщения и отправляет их приложению. Приложение сортирует их, скачивает вложения и пишет один HTML-файл, который открывается без интернета.
 
 ```
-discord-messages-exporter/
-├── assets/
-│   └── logo.png          # Официальный логотип проекта / Project logo
-├── main.py               # Серверная логика, Tkinter GUI и шаблонизатор экспорта
-├── requirements.txt      # Список зависимостей Python
-├── start.bat             # Скрипт быстрого запуска для Windows
-├── .gitignore            # Защита приватных данных и экспортированных чатов
-├── LICENSE               # Строгая проприетарная лицензия / Proprietary License
-└── README.md             # Документация (EN & RU)
+клиент Discord (скрипт в консоли, прокрутка) > локальный сервер :8089 > сортировка и склейка > вложения > HTML в Exported_Chats/
 ```
 
----
+Данные ходят только между окном Discord и приложением на том же компьютере.
 
-## Лицензия / License
+### Возможности
 
-Программное обеспечение распространяется на условиях **строгой проприетарной лицензии (Proprietary Software License)**. Все права защищены MilkyCloud. Копирование, распространение, модификация и коммерческое использование исходного кода строго запрещены без предварительного письменного согласия правообладателя. См. [`LICENSE`](LICENSE) для подробностей.
+- Тёмная тема Discord, интервалы Cozy, градиентные ники Nitro, украшения аватаров поверх аватара.
+- Вложения с `cdn.discordapp.com` и `media.discordapp.net` сохраняются в `attachments/`.
+- Полноразмерные картинки восстанавливаются по ссылкам, даже если Discord уже выгрузил теги `<img>`.
+- Из времени убраны дубли для скринридеров; у сгруппированных сообщений короткое время в левой колонке.
+- Пути эмодзи и SVG-иконок переписаны, чтобы они отображались офлайн.
+- Счётчик на экране Discord с кнопкой `Остановить и сохранить`; в начале чата скрипт останавливается сам.
+- Одна кнопка включает DevTools в Discord Stable, PTB и Canary.
+- Интерфейс на английском и русском.
 
+### Требования
+
+Windows 10 или 11, клиент Discord для ПК, Python 3.9 или новее при запуске из исходников, интернет во время экспорта для вложений.
+
+### Использование
+
+1. Запустите приложение (`python main.py` или `start.bat`).
+2. Нажмите «Разблокировать DevTools в Discord» и перезапустите Discord.
+3. Откройте нужный чат.
+4. Нажмите `Ctrl+Shift+I`, откройте вкладку Console, вставьте скрипт, скопированный из приложения, и нажмите Enter.
+5. Дождитесь начала чата или нажмите `Остановить и сохранить`. Архив появится в `Exported_Chats/<название чата>/`.
+
+### Правила Discord
+
+Скрипты в консоли клиента и автоматическая прокрутка выходят за рамки того, что Discord разрешает для пользовательских аккаунтов. Используйте для своих переписок и на свой риск.
+
+### Релизы
+
+Тег `v*` собирает `DiscordExporter_Windows.zip` через PyInstaller в GitHub Actions и публикует его с описанием из [CHANGELOG.md](CHANGELOG.md).
+
+### Лицензия
+
+Проприетарная, все права защищены. Запуск официальных сборок из релизов разрешён; полные условия в [LICENSE](LICENSE).
